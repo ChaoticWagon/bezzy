@@ -9,6 +9,10 @@ fn main() {
     let mut spline: BezierSpline = BezierSpline::new();
     spline.add_knot(Point::new(0.0, 0.0));
     spline.add_knot(Point::new(1.0, 0.0));
+    spline.add_knot(Point::new(2.0, 0.0));
+    spline.add_knot(Point::new(3.0, 0.0));
+
+    println!("{:?}", spline.points);
 
     // println!("{}, {}", &s1.get_point(0.5).unwrap().x, &s1.get_point(0.5).unwrap().y);
 

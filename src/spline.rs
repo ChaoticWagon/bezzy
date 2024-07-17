@@ -1,12 +1,12 @@
 use crate::curve::CubicBezier;
 use crate::point::Point;
 
-pub struct BezierSpline<> {
+pub struct BezierSpline {
     pub points: Vec<Point>,
     pub curves: Vec<CubicBezier>,
 }
 
-impl<> BezierSpline<> {
+impl BezierSpline {
     pub fn new() -> BezierSpline {
         BezierSpline {
             points: Vec::new(),
@@ -14,21 +14,30 @@ impl<> BezierSpline<> {
         }
     }
 
-    pub fn add_knot(&'static mut self, point: Point) {
+    pub fn add_knot(&mut self, point: Point) {
         match self.points.last() {
-            Some(..) => {
+            Some(last) => {
                 // add 2 points in between the previous point in the spline and the new one
-                let distance = self.points.last().unwrap().distance_to(&point);
-                let step = distance / 3.0;
+                let dx =  point.x - last.x;
+                let step_x = dx / 3.0;
 
-                self.points.push(Point::new(&point.x - (step * 2.0), &point.y - (step * 2.0)));
-                self.points.push(Point::new(&point.x - step, &point.y - step));
+                let dy = point.y - last.y;
+                let step_y = dy / 3.0;
+
+                self.points.push(Point::new(&point.x - (step_x * 2.0), &point.y - (step_y * 2.0)));
+                self.points.push(Point::new(&point.x - step_x, &point.y - step_y));
 
                 // add the new knot
                 self.points.push(point);
 
                 // create a new Bézier curve
-                self.curves.push(CubicBezier::new(self.points.get((self.points.len() - 4)..(self.points.len() - 1)).unwrap().try_into().unwrap()));
+                let thing: [Point; 4] = [
+                    self.points[self.points.len() - 4],
+                    self.points[self.points.len() - 3],
+                    self.points[self.points.len() - 2],
+                    self.points[self.points.len() - 1],
+                ];
+                self.curves.push(CubicBezier::new(thing));
             }
             None => {
                 // nothing in points so we add the first knot
@@ -41,6 +50,10 @@ impl<> BezierSpline<> {
     pub fn get_point(&self, t: f64) -> Result<Point, &'static str> {
         if t < 0.0 || t > 1.0 {
             return Err("t must be between 0 and 1");
+        }
+
+        if t == 1.0 {
+            return self.curves.last().unwrap().get_point(t);
         }
 
         let mut t = t * self.curves.len() as f64;

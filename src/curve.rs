@@ -1,12 +1,12 @@
 use crate::point::Point;
 
-pub struct CubicBezier<> {
-    pub points: &'static[Point]
+pub struct CubicBezier {
+    pub points: [Point; 4]
 }
 
 
 impl CubicBezier {
-    pub fn new(points: &'static[Point; 4]) -> CubicBezier {
+    pub fn new(points: [Point; 4]) -> CubicBezier {
         CubicBezier {
             points
         }

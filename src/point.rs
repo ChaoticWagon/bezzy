@@ -11,11 +11,6 @@ impl Point {
         Point { x, y }
     }
 
-    pub fn distance_to(&self, other: &Point) -> f64 {
-        let x = self.x - other.x;
-        let y = self.y - other.y;
-        (x * x + y * y).sqrt()
-    }
 }
 
 impl Mul<&Point> for &Point {
