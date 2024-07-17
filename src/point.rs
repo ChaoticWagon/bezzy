@@ -1,5 +1,6 @@
 use std::ops::{Add, Mul, Sub};
 
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub struct Point {
     pub x: f64,
     pub y: f64,
@@ -8,6 +9,12 @@ pub struct Point {
 impl Point {
     pub fn new(x: f64, y: f64) -> Point {
         Point { x, y }
+    }
+
+    pub fn distance_to(&self, other: &Point) -> f64 {
+        let x = self.x - other.x;
+        let y = self.y - other.y;
+        (x * x + y * y).sqrt()
     }
 }
 

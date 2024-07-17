@@ -1,11 +1,43 @@
-use crate::point::Point;
 use crate::curve::CubicBezier;
+use crate::point::Point;
 
-pub struct BezierSpline {
+pub struct BezierSpline<> {
+    pub points: Vec<Point>,
     pub curves: Vec<CubicBezier>,
 }
 
-impl BezierSpline {
+impl<> BezierSpline<> {
+    pub fn new() -> BezierSpline {
+        BezierSpline {
+            points: Vec::new(),
+            curves: Vec::new(),
+        }
+    }
+
+    pub fn add_knot(&'static mut self, point: Point) {
+        match self.points.last() {
+            Some(..) => {
+                // add 2 points in between the previous point in the spline and the new one
+                let distance = self.points.last().unwrap().distance_to(&point);
+                let step = distance / 3.0;
+
+                self.points.push(Point::new(&point.x - (step * 2.0), &point.y - (step * 2.0)));
+                self.points.push(Point::new(&point.x - step, &point.y - step));
+
+                // add the new knot
+                self.points.push(point);
+
+                // create a new Bézier curve
+                self.curves.push(CubicBezier::new(self.points.get((self.points.len() - 4)..(self.points.len() - 1)).unwrap().try_into().unwrap()));
+            }
+            None => {
+                // nothing in points so we add the first knot
+                self.points.push(point)
+            }
+        }
+    }
+
+
     pub fn get_point(&self, t: f64) -> Result<Point, &'static str> {
         if t < 0.0 || t > 1.0 {
             return Err("t must be between 0 and 1");
